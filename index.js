@@ -8,15 +8,8 @@ import figlet from 'figlet';
 const sleep = (ms = 1000) => new Promise((r) => setTimeout(r, ms));
 
 const startGame = async () => {
-  figlet(`Let's Play Wordie!`, async function(err, data) {
-    if (err) {
-        console.log('Something went wrong...');
-        console.dir(err);
-        return;
-    }
-    console.log(data)
-    
-  });
+  console.log(chalk.blue(`Let's Play `) + chalk.red(`Wordie!`));
+  console.log(chalk.red('Hello', chalk.underline.bgBlue('world') + '!'));
   await sleep();
 };
 
@@ -27,7 +20,8 @@ const generateWord = (wordLength) => {
   while(item.length !== wordLength) {
     item = wordArray[Math.floor(Math.random() * wordArray.length)];
   }
-  return item;
+  // console.log(item.toUpperCase());
+  return item.toUpperCase();
 }
 
 const handleAnswer = async (puzzleWord, userGuess) => {
@@ -55,14 +49,14 @@ const handleAnswer = async (puzzleWord, userGuess) => {
   }
 }
 
-const getAnswer = async () => {
+const getAnswer = async (count) => {
   const answers = await inquirer.prompt({
     name: 'answer',
     type: 'input',
-    message: 'Guess:'
+    message: `Guess ${count + 1}:`
   });
 
-  return answers.answer;
+  return answers.answer.toUpperCase();
 }
 
 const playGame = async () => {
@@ -70,7 +64,7 @@ const playGame = async () => {
   const puzzleWord = generateWord(5);
 
   for(let i = 0; i < turns; i++) {
-    const userGuess = await getAnswer();
+    const userGuess = await getAnswer(i);
     handleAnswer(puzzleWord, userGuess);
   }
 };
