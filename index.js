@@ -3,14 +3,21 @@ import chalkAnimation from 'chalk-animation';
 import word from 'word-list';
 import fs from 'fs';
 import inquirer from 'inquirer';
+import figlet from 'figlet';
 
-const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms));
-const playerName = 'Asdf';
+const sleep = (ms = 1000) => new Promise((r) => setTimeout(r, ms));
 
-const startGame = () => {
-  const title = chalkAnimation.rainbow(`Let's Play Wordie!`);
-  //await sleep();
-  //title.stop();
+const startGame = async () => {
+  figlet(`Let's Play Wordie!`, async function(err, data) {
+    if (err) {
+        console.log('Something went wrong...');
+        console.dir(err);
+        return;
+    }
+    console.log(data)
+    
+  });
+  await sleep();
 };
 
 const generateWord = (wordLength) => {
@@ -20,18 +27,10 @@ const generateWord = (wordLength) => {
   while(item.length !== wordLength) {
     item = wordArray[Math.floor(Math.random() * wordArray.length)];
   }
-  console.log(item);
   return item;
 }
 
-async function handleAnswer(puzzleWord, userGuess) {
-  //const spinner = createSpinner('Checking answer...').start();
-  //await sleep();
-
-  // console.log([...puzzleWord]);
-  // console.log([...userGuess]);
-
-  const puzzleWordArray = [...puzzleWord];
+const handleAnswer = async (puzzleWord, userGuess) => {
   const userGuessArray = [...userGuess];
   const resultsArray = [0, 0, 0, 0, 0];
   let isCorrect = false;
@@ -49,32 +48,32 @@ async function handleAnswer(puzzleWord, userGuess) {
   }
 
   if (isCorrect) {
-    // spinner.success({ text: `Nice work ${playerName}. That's a legit answer` });
-    console.log("Correct!");
-  } else {
-    // spinner.error({ text: `💀💀💀 Game over, you lose ${playerName}!` });
-    console.log("Wrong!");
-    console.log(resultsArray);
+    console.log("You got the word!");
     process.exit(1);
+  } else {
+    console.log(resultsArray);
   }
 }
 
-async function getAnswer() {
+const getAnswer = async () => {
   const answers = await inquirer.prompt({
     name: 'answer',
     type: 'input',
-    message: 'Answer?',
-    default() {
-      return 'Player';
-    },
+    message: 'Guess:'
   });
 
   return answers.answer;
 }
 
+const playGame = async () => {
+  let turns = 6;
+  const puzzleWord = generateWord(5);
 
-startGame();
-console.log('module: ', word);
-const puzzleWord = generateWord(5);
-const userGuess = await getAnswer();
-handleAnswer(puzzleWord, userGuess);
+  for(let i = 0; i < turns; i++) {
+    const userGuess = await getAnswer();
+    handleAnswer(puzzleWord, userGuess);
+  }
+};
+
+await startGame();
+playGame();
